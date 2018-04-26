@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/30 18:59:34 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/01/30 18:59:37 by kboucaud         ###   ########.fr       */
+/*   Updated: 2018/04/25 15:09:43 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,15 @@ t_coo		get_coo(char **str, int err)
 	new.y = ft_atof(str[2]);
 	new.z = ft_atof(str[3]);
 	return (new);
+}
+
+t_cam_mode  get_view_mode(char **str, int err)
+{
+    t_cam_mode  mode;
+    
+    if (tab_len(str) != 2)
+        ft_bad_arg(err);
+    return (mode);
 }
 
 t_material	*get_color(char **str)

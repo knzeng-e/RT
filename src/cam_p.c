@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/15 22:26:16 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/02/15 22:26:19 by kboucaud         ###   ########.fr       */
+/*   Updated: 2018/04/25 15:14:10 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,11 @@ t_cam		*ini_cam(void)
 		ft_malloc_error();
 	cam->pos = ft_new_vect(0, 0, 0);
 	cam->rot = ft_new_vect(0, 0, 0);
+    cam->mode = MONO;
+	if (!(cam->left_cam = (t_cam*)malloc(sizeof(t_cam))))
+		ft_malloc_error();
+	if (!(cam->right_cam = (t_cam*)malloc(sizeof(t_cam))))
+		ft_malloc_error();
 	return (cam);
 }
 
@@ -55,9 +60,11 @@ int			ft_add_cam(int fd, t_rt *rt)
 		if (datas[0] == 0)
 			ret++;
 		else if (ft_strcmp(datas[0], "coo:") == 0)
-			cam->pos = get_coo(datas, 2);
+			cam->pos = get_coo(datas, ERREUR_COOR);
 		else if (ft_strcmp(datas[0], "rot:") == 0)
-			cam->rot = get_coo(datas, 7);
+			cam->rot = get_coo(datas, ERREUR_ROTA);
+		else if (ft_strcmp(datas[0], "view:") == 0)
+            cam->mode = get_view_mode(datas, ERREUR_MODE);
 		else if (datas[1] == NULL && ft_check_obj(datas[0], fd, rt) == 1)
 			ret++;
 		else

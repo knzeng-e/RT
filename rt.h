@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/21 01:04:26 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/20 23:12:24 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2018/04/25 15:13:28 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,10 @@
 # define CYL 4
 # define CUB 5
 # define ELL 6
+
+# define ERREUR_COOR 2
+# define ERREUR_MODE 3
+# define ERREUR_ROTA 7
 
 # include "libft/includes/libft.h"
 # include "SDL2.framework/Headers/SDL.h"
@@ -63,6 +67,7 @@ typedef	struct			s_plane
 	t_coo				norm;
 	t_coo				o;
 	double				supp;
+	double				shine;
 	int					id;
 	int					cut;
 	struct s_plane		*next;
@@ -145,6 +150,7 @@ typedef struct			s_light
 	double				shine;
 	double				amb;
 	int					id;
+    int                 type;
 	struct s_light		*next;
 }						t_light;
 
@@ -155,14 +161,44 @@ typedef	struct			s_ray
 	t_coo				obj;
 }						t_ray;
 
+
+typedef enum            e_cam_mode
+{
+                        MONO,
+                        STEREO
+}                       t_cam_mode;
+
 typedef	struct			s_cam
 {
+    t_cam_mode          mode;
 	t_coo				pos;
 	t_coo				forw;
 	t_coo				up;
 	t_coo				right;
 	t_coo				rot;
+    struct s_cam        *left_cam;
+    struct s_cam        *right_cam;
 }						t_cam;
+
+typedef /*! \enum viewing type
+ *
+ *  This allows us to specify parallel or transverse
+ *  viewing when the raytracer displays the images
+ */
+enum                    e_view
+{
+                        parallel,
+                        transverse
+}                       t_viewing;
+
+typedef struct          s_stereo_cam
+{
+    t_cam               *cam_left;
+    t_cam               *cam_right;
+    int                 pixel_gap;
+    double              angle;
+    t_viewing           viewing;
+}                       t_stereo_cam;
 
 typedef	struct			s_view
 {
@@ -205,6 +241,7 @@ typedef	struct			s_options
 	int					obj;
 	int					id;
 	int					cam_move;
+    int                 cam_stereo;
 }						t_options;
 
 typedef	struct			s_rt

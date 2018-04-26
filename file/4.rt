@@ -5,10 +5,6 @@ plane
 coo: 0 -1 0
 norm: 0 1 0
 color: 0.7 0.6 0.7
-plane
-coo: 0 0 15
-norm: 0 0 -1
-color: 0 0 1
 cone
 coo: 0.7 -0.5 11
 angle: 15

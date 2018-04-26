@@ -3,10 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   move_object.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
+/*   By: knzeng-e <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/04/24 02:09:19 by knzeng-e          #+#    #+#             */
+/*   Updated: 2018/04/24 02:38:38 by knzeng-e         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   move_object.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 13:40:59 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/10 13:41:00 by kboucaud         ###   ########.fr       */
+/*   Updated: 2018/04/24 02:09:04 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,16 +122,56 @@ void		get_obj(t_rt *rt, int x, int y)
 	rt->op->id = rt->inter->num;
 }
 
+int        moving_sphere(void *rt)
+{
+    SDL_Event ev;
+	if (((t_rt *)rt)->op->obj == SPH)
+		move_sphere(rt, ev);
+    return (0);
+}
+
+int        moving_plane(void *rt)
+{
+    SDL_Event ev;
+	if (((t_rt *)rt)->op->obj == PLN)
+		move_plane(rt, ev);
+    return (0);
+}
+
+int        moving_cyl(void *rt)
+{
+    SDL_Event ev;
+	if (((t_rt *)rt)->op->obj == CYL)
+		move_cyl(rt, ev);
+    return (0);
+}
+
+int        moving_cone(void *rt)
+{
+    SDL_Event ev;
+
+    if (((t_rt *)rt)->op->obj == CON)
+        move_cone(rt, ev);
+    return (0);
+}
+
 void		move_object(t_rt *rt, SDL_Event ev)
 {
-	if (rt->op->obj == SPH)
-		move_sphere(rt, ev);
-	else if (rt->op->obj == PLN)
-		move_plane(rt, ev);
-	else if (rt->op->obj == CYL)
-		move_cyl(rt, ev);
-	else if (rt->op->obj == CON)
-		move_cone(rt, ev);
-	ft_reset(rt);
-	ft_raytracing(rt);
+    SDL_Thread  *move_sphere_thread;
+    SDL_Thread  *move_plane_thread;
+    SDL_Thread  *move_cyl_thread;
+    SDL_Thread  *move_cone_thread;
+
+    move_sphere_thread = SDL_CreateThread(moving_sphere, "sphere_move", rt);
+    move_plane_thread = SDL_CreateThread(moving_plane, "plane_move", rt);
+    move_cyl_thread = SDL_CreateThread(moving_cyl, "cyl_move", rt);
+    move_cone_thread = SDL_CreateThread(moving_cone, "cone_move", rt);
+    /*	else if (rt->op->obj == PLN)
+        move_plane(rt, ev);
+        else if (rt->op->obj == CYL)
+        move_cyl(rt, ev);
+        else if (rt->op->obj == CON)
+        move_cone(rt, ev);*/
+    ft_reset(rt);
+    ft_raytracing(rt);
 }

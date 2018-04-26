@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/21 01:04:33 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/19 00:10:12 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2018/04/24 16:07:57 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void		ft_create(t_rt *rt)
 	if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) < 0)
 		ft_exit();
 	if (!(rt->data->sdl_window = SDL_CreateWindow("RT - SDL",
-	SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_LEN, WIN_HEIGHT, 0)))
+	SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_LEN, WIN_HEIGHT, SDL_WINDOW_RESIZABLE)))
 		ft_exit();
 	if (!(rt->data->sdl_renderer = SDL_CreateRenderer(rt->data->sdl_window,
 	-1, 0)))
