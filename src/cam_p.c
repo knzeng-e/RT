@@ -15,9 +15,9 @@
 void        show_cam_mode(t_cam_mode cam_mode)
 {
     if (cam_mode == MONO)
-        ft_putstr("MONO VIEW");
+        ft_putstr("MONO VIEW\n");
     if (cam_mode == STEREO)
-        ft_putstr("STEREO VIEW");
+        ft_putstr("STEREO VIEW\n");
 }
 
 void		move_camera(t_rt *rt, SDL_Event ev)
@@ -28,6 +28,8 @@ void		move_camera(t_rt *rt, SDL_Event ev)
 	{
 		rt->cam->rot.y += -(float)ev.motion.xrel / 20;
 		rt->cam->rot.x += -(float)ev.motion.yrel / 20;
+		rt->cam->right_cam->rot.y += -(float)ev.motion.xrel / 20;
+		rt->cam->left_cam->rot.x += -(float)ev.motion.yrel / 20;
 	}
 	ft_raytracing(rt);
 }
@@ -45,6 +47,8 @@ t_cam		*ini_cam(void)
 		ft_malloc_error();
 	if (!(cam->right_cam = (t_cam*)malloc(sizeof(t_cam))))
 		ft_malloc_error();
+	cam->right_cam->pos = ft_new_vect(-3, 0, 0);
+	cam->left_cam->pos = ft_new_vect(3, 0, 0);
 	return (cam);
 }
 
@@ -62,6 +66,7 @@ int			ft_add_cam(int fd, t_rt *rt)
 	t_cam		*cam;
 
 	cam = ini_cam();
+	rt->switch_cam_mode = 0;
 	while ((ret = get_next_line(fd, &line)) > 0)
 	{
 		datas = ft_strsplit(line, ' ');

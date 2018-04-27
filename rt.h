@@ -261,6 +261,7 @@ typedef	struct			s_rt
 	t_inter				*inter;
 	t_start				*start;
 	t_options			*op;
+	int					switch_cam_mode;
 }						t_rt;
 
 void					ft_malloc_error(void);
@@ -324,6 +325,7 @@ void					check_cylinder_inter(t_rt *rt, int type);
 int						ft_add_light(int fd, t_rt *rt, int id);
 
 int						ft_add_cam(int fd, t_rt *rt);
+void					ft_ini_cam(t_rt *rt);
 
 void					ft_get_point(t_rt *rt);
 
@@ -357,6 +359,7 @@ void					cpy_image(unsigned int *tab1, unsigned int *tab2);
 void					move_object(t_rt *rt, SDL_Event ev);
 void					get_obj(t_rt *rt, int x, int y);
 void					move_camera(t_rt *rt, SDL_Event ev);
+void					show_cam_mode(t_cam_mode cam_mode);
 t_coo					ft_inv_rot(t_coo vect, t_coo rot);
 void					move_color(t_material *c, double r, double g, double b);
 #endif

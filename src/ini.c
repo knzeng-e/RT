@@ -14,14 +14,23 @@
 
 void	ft_ini_viewplane(t_rt *rt)
 {
+	t_coo	cam_pos;
+	t_coo	cam_forw;
+	t_coo	cam_up;
+	t_coo	cam_right;
+
+	cam_pos = ((rt->cam->mode == MONO) ? rt->cam->pos : rt->cam->right_cam->pos);
+	cam_forw = ((rt->cam->mode == MONO) ? rt->cam->forw : rt->cam->right_cam->forw);
+	cam_up = ((rt->cam->mode == MONO) ? rt->cam->up : rt->cam->right_cam->up);
+	cam_right = ((rt->cam->mode == MONO) ? rt->cam->right : rt->cam->right_cam->right);
 	if (!(rt->view = (t_view*)malloc(sizeof(t_view))))
 		ft_malloc_error();
 	rt->view->height = 35;
 	rt->view->length = 50;
-	rt->view->up_left = ft_add_vect(rt->cam->pos,
-	ft_add_vect(ft_mult_vect(PLN_DST, rt->cam->forw), ft_sub_vect(ft_mult_vect(
-	rt->view->height / 2, rt->cam->up), ft_mult_vect(rt->view->length / 2,
-	rt->cam->right))));
+	rt->view->up_left = ft_add_vect(cam_up,
+	ft_add_vect(ft_mult_vect(PLN_DST, cam_forw), ft_sub_vect(ft_mult_vect(
+	rt->view->height / 2, cam_up), ft_mult_vect(rt->view->length / 2,
+	cam_right))));
 }
 
 void	ft_ini_cam(t_rt *rt)
@@ -29,6 +38,14 @@ void	ft_ini_cam(t_rt *rt)
 	rt->cam->forw = ft_new_vect(0, 0, 1);
 	rt->cam->up = ft_new_vect(0, 1, 0);
 	rt->cam->right = ft_new_vect(1, 0, 0);
+
+	rt->cam->left_cam->forw = ft_new_vect(0, 0, 1);
+	rt->cam->left_cam->up = ft_new_vect(0, 1, 0);
+	rt->cam->left_cam->right = ft_new_vect(1, 0, 0);
+	
+	rt->cam->right_cam->forw = ft_new_vect(0, 0, 1);
+	rt->cam->right_cam->up = ft_new_vect(0, -1, 0);
+	rt->cam->right_cam->right = ft_new_vect(1, 0, 0);
 	ft_ini_viewplane(rt);
 }
 

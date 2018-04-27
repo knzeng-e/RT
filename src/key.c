@@ -43,6 +43,15 @@ int			my_key_press(t_rt *rt, SDL_Keysym key)
 		rt->op->aa = !rt->op->aa;
 		aliasing(rt);
 	}
+	else if (key.sym == SDLK_m)
+	{
+		rt->switch_cam_mode = (rt->switch_cam_mode) ? 0 : 1;
+		ft_ini_cam(rt);
+		rt->cam->mode = (rt->cam->mode == MONO) ? STEREO : MONO;
+		show_cam_mode(rt->cam->mode);
+	}
+	if (rt->switch_cam_mode == 1)
+		ft_raytracing(rt);
 	if (rt->op->blwh)
 		bl_wh(rt);
 	if (rt->op->sepia)

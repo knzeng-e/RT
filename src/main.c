@@ -19,7 +19,7 @@ void		ft_create(t_rt *rt)
 	if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) < 0)
 		ft_exit();
 	if (!(rt->data->sdl_window = SDL_CreateWindow("RT - SDL",
-	SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_LEN, WIN_HEIGHT, SDL_WINDOW_RESIZABLE)))
+	SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_LEN * 2, WIN_HEIGHT * 2, SDL_WINDOW_RESIZABLE)))
 		ft_exit();
 	if (!(rt->data->sdl_renderer = SDL_CreateRenderer(rt->data->sdl_window,
 	-1, 0)))
