@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/21 01:04:33 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/24 16:07:57 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2018/04/27 19:45:18 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,17 @@
 
 void		ft_create(t_rt *rt)
 {
+    double  len;
+    double  height;
+
+    len = rt->cam->mode == MONO ? WIN_LEN : 2 * WIN_LEN;
+    height = rt->cam->mode == MONO ? WIN_HEIGHT : 2 * WIN_HEIGHT;
 	if (!(rt->data = (t_data*)malloc(sizeof(t_data))))
 		ft_malloc_error();
 	if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) < 0)
 		ft_exit();
 	if (!(rt->data->sdl_window = SDL_CreateWindow("RT - SDL",
-	SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_LEN * 2, WIN_HEIGHT * 2, SDL_WINDOW_RESIZABLE)))
+	SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, len, height, SDL_WINDOW_RESIZABLE)))
 		ft_exit();
 	if (!(rt->data->sdl_renderer = SDL_CreateRenderer(rt->data->sdl_window,
 	-1, 0)))

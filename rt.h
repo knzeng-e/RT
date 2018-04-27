@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/21 01:04:26 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/27 13:18:27 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2018/04/27 19:24:11 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,6 +176,8 @@ typedef	struct			s_cam
 	t_coo				up;
 	t_coo				right;
 	t_coo				rot;
+    double              separation;
+    double              distance_vp;
     struct s_cam        *left_cam;
     struct s_cam        *right_cam;
 }						t_cam;
