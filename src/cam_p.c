@@ -6,11 +6,19 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/15 22:26:16 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/25 15:14:10 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2018/04/27 13:54:27 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../rt.h"
+
+void        show_cam_mode(t_cam_mode cam_mode)
+{
+    if (cam_mode == MONO)
+        ft_putstr("MONO VIEW");
+    if (cam_mode == STEREO)
+        ft_putstr("STEREO VIEW");
+}
 
 void		move_camera(t_rt *rt, SDL_Event ev)
 {
@@ -64,7 +72,11 @@ int			ft_add_cam(int fd, t_rt *rt)
 		else if (ft_strcmp(datas[0], "rot:") == 0)
 			cam->rot = get_coo(datas, ERREUR_ROTA);
 		else if (ft_strcmp(datas[0], "view:") == 0)
+        {
             cam->mode = get_view_mode(datas, ERREUR_MODE);
+            ft_putstr("\nCAMERA MODE ===> ");
+            show_cam_mode(cam->mode);
+        }
 		else if (datas[1] == NULL && ft_check_obj(datas[0], fd, rt) == 1)
 			ret++;
 		else

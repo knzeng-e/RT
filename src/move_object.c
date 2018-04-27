@@ -6,7 +6,7 @@
 /*   By: knzeng-e <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/24 02:09:19 by knzeng-e          #+#    #+#             */
-/*   Updated: 2018/04/24 02:38:38 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2018/04/27 13:02:38 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,9 +163,13 @@ void		move_object(t_rt *rt, SDL_Event ev)
     SDL_Thread  *move_cone_thread;
 
     move_sphere_thread = SDL_CreateThread(moving_sphere, "sphere_move", rt);
+    SDL_WaitThread(move_sphere_thread, NULL);
     move_plane_thread = SDL_CreateThread(moving_plane, "plane_move", rt);
+    SDL_WaitThread(move_plane_thread, NULL);
     move_cyl_thread = SDL_CreateThread(moving_cyl, "cyl_move", rt);
+    SDL_WaitThread(move_cyl_thread, NULL);
     move_cone_thread = SDL_CreateThread(moving_cone, "cone_move", rt);
+    SDL_WaitThread(move_cone_thread, NULL);
     /*	else if (rt->op->obj == PLN)
         move_plane(rt, ev);
         else if (rt->op->obj == CYL)

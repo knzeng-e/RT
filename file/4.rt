@@ -1,6 +1,7 @@
 camera
 coo: 0 0 0
 rot: 0 0 0
+view: MONO
 plane
 coo: 0 -1 0
 norm: 0 1 0

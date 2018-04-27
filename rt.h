@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/21 01:04:26 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/25 15:13:28 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2018/04/27 13:18:27 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -346,6 +346,7 @@ void					check_ellipse_inter(t_rt *rt, int type);
 int						ft_add_ellipse(int fd, t_rt *rt, int id);
 
 t_material				hex_rgb(int col);
+t_cam_mode              get_view_mode(char **str, int err);
 unsigned int			col_hexa(int r, int g, int b);
 void					ft_check_expose(t_material *mat, double max);
 

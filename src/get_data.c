@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/30 18:59:34 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/25 15:09:43 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2018/04/27 13:26:43 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,10 @@ t_cam_mode  get_view_mode(char **str, int err)
     
     if (tab_len(str) != 2)
         ft_bad_arg(err);
+    if (!ft_strcmp(str[1], "MONO") || !ft_strcmp(str[1], "mono"))
+        return (MONO);
+    else if (!ft_strcmp(str[1], "stereo") || !ft_strcmp(str[1], "STEREO"))
+        return (STEREO);
     return (mode);
 }
 

@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/03 20:11:06 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/24 19:57:30 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2018/04/27 13:32:56 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ void		ft_ini_ray(t_rt *rt, double x, double y)
 	rt->ray->dir = ft_rotation(rt->ray->dir, rt->cam->rot);
 	rt->ray->dir = ft_normalize(rt->ray->dir);
 }
-
 
 void		ft_raytracing(t_rt *rt)
 {
