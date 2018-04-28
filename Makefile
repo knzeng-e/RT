@@ -1,42 +1,91 @@
 NAME = "RT"
-SRC_PATH = ./src/
-INC_PATH = ./rt.h
-OBJ_PATH = ./obj/
-SRC_NAME = $(shell ls $(SRC_PATH) | grep .c)
-OBJ_NAME = $(SRC_NAME:.c=.o)
-SRC = $(addprefix $(SRC_PATH),$(SRC_NAME))
-OBJ = $(addprefix $(OBJ_PATH),$(OBJ_NAME))
 
-LIBS = libft/libft.a SDL2.framework/SDL2
+SRC =	src/core/main.c \
+		src/core/ini.c \
+		src/core/raytracing.c \
+		src/core/ft_check_object.c \
+		src/core/light.c \
+		src/event/key.c \
+		src/event/move_object.c \
+		src/event/move_object_2.c \
+		src/utilities/error.c \
+		src/utilities/pixel.c \
+		src/utilities/free.c \
+		src/utilities/free_2.c \
+		src/utilities/color.c \
+		src/graphics/text.c \
+		src/graphics/aliasing.c \
+		src/graphics/filter.c \
+		src/graphics/threads.c \
+		src/mathematics/rotation.c \
+		src/mathematics/rot_objects.c \
+		src/mathematics/vect.c \
+		src/mathematics/vect_2.c \
+		src/mathematics/equation.c \
+		src/mathematics/equation_2.c \
+		src/mathematics/equation_3.c \
+		src/object/sphere.c \
+		src/object/plane.c \
+		src/object/cone.c \
+		src/object/cylinder.c \
+		src/object/cube.c \
+		src/object/cube_2.c \
+		src/object/ellipse.c \
+		src/object/tore.c \
+		src/object/tore_2.c \
+		src/object/parabol.c \
+		src/parser/parser.c \
+		src/parser/sphere_p.c \
+		src/parser/get_data.c \
+		src/parser/plane_p.c \
+		src/parser/cone_p.c \
+		src/parser/cylinder_p.c \
+		src/parser/cam_p.c \
+		src/parser/light_p.c \
+		src/parser/cube_p.c \
+		src/parser/ellipse_p.c \
+		src/parser/tore_p.c \
+		src/parser/parabol_p.c \
+		src/parser/infos.c \
+		src/parser/ambiant.c \
+
+LIBS = libft/libft.a
 
 OBJ =	$(patsubst src/%.c,obj/%.o,$(SRC))
 
-#.SILENT :
+SDL2_F = -framework SDL2 -framework SDL2_ttf -framework SDL2_image -F ./frameworks/
 
-all : $(OBJ) $(NAME)
+SDL2_P = -rpath @loader_path/frameworks/
+
+SDL2_I = -I ./frameworks/SDL2.framework/Headers
+
+SDL2_TTF_I = -I ./frameworks/SDL2_ttf.framework/Headers
+
+SDL2_IMG_I = -I ./frameworks/SDL2_image.framework/Headers
+
+.SILENT :
+
+all : $(NAME)
 
 $(NAME) : $(OBJ)
-	@echo "\033[33m >>> \033[32mCOMPILING \033[36;4m\"$(NAME)\"\033[0m \033[32m...\033[33m <<<\033[0m"
-	@gcc $(LIBS) $(OBJ) -o $(NAME)
+		gcc $(LIBS) $(SDL2_F) $(OBJ) -o $(NAME) $(SDL2_P) $(SDL2_I) $(SDL2_TTF_I) $(SDL2_IMG_i)
 
-$(OBJ_PATH)%.o: $(SRC_PATH)%.c 
-#obj/%.o: src/%.c
-	@mkdir $(OBJ_PATH) 2> /dev/null || echo '' > /dev/null
-	@mkdir -p obj
-	@gcc -Wall -Wextra -Werror -ofast -c $< -o $@
-	@echo "\033[35m >>> \033[32mCOMPILING \"$<\"..\033[35m <<<\033[0m"
+obj/%.o: src/%.c
+	mkdir -p obj
+	mkdir -p obj/parser
+	mkdir -p obj/object
+	mkdir -p obj/mathematics
+	mkdir -p obj/graphics
+	mkdir -p obj/utilities
+	mkdir -p obj/event
+	mkdir -p obj/core
+	gcc -Wall -Wextra -Werror -c $< -o $@ -Ofast -mtune=native
 
 clean :
 	/bin/rm -rf obj
-	@echo "\033[32m >>> [$(NAME)] >>> \033[31m Remove all .o files\033[0m"
 
 fclean : clean
-	@echo "\033[31m >>> \033[33;4m \"$(NAME)\" EXECUTABLE DELETED\033[0m"
 	/bin/rm -rf $(NAME)
-
-norme :
-	@echo "\033[32m==> norminette : \033[33;4m$(INC_PATH)\033[0m \033[33;4m$(SRC_PATH)\033[0m"
-	@norminette $(INC_PATH) $(SRC_PATH)
 
 re : fclean all
 

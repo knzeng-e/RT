@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/21 01:04:26 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/27 13:18:27 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2018/04/28 21:47:53 by knzeng-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,13 @@
 # define WIN_HEIGHT 480
 # define PLN_DST 100
 # define EPS 0.0001
-# define ANTIALIA 30
+# define ANTIALIA 10
 # define MAX 9999
 # define AMB 0.2
+
+# define DOWN SDL_MOUSEBUTTONDOWN
+# define UP SDL_MOUSEBUTTONUP
+# define MOTION SDL_MOUSEMOTION
 
 # define SPH 1
 # define PLN 2
@@ -27,16 +31,17 @@
 # define CYL 4
 # define CUB 5
 # define ELL 6
-
-# define ERREUR_COOR 2
-# define ERREUR_MODE 3
-# define ERREUR_ROTA 7
+# define TOR 7
+# define PAR 8
+# define HYP 9
 
 # include "libft/includes/libft.h"
-# include "SDL2.framework/Headers/SDL.h"
-# include "SDL2.framework/Headers/SDL_thread.h"
-#include <OpenCL/cl.h>
+# include "frameworks/SDL2.framework/Headers/SDL.h"
+# include "frameworks/SDL2_ttf.framework/Headers/SDL_ttf.h"
+# include "frameworks/SDL2_image.framework/Headers/SDL_image.h"
 # include <math.h>
+# include <complex.h>
+# include <pthread.h>
 
 typedef	struct			s_material
 {
@@ -59,7 +64,14 @@ typedef	struct			s_data
 	SDL_Window			*sdl_window;
 	SDL_Renderer		*sdl_renderer;
 	SDL_Texture			*sdl_texture;
+	SDL_Window			*info_window;
+	SDL_Surface			*info_surface;
+	TTF_Font			*font;
 }						t_data;
+
+/*
+** Object Structs
+*/
 
 typedef	struct			s_plane
 {
@@ -67,7 +79,6 @@ typedef	struct			s_plane
 	t_coo				norm;
 	t_coo				o;
 	double				supp;
-	double				shine;
 	int					id;
 	int					cut;
 	struct s_plane		*next;
@@ -142,15 +153,45 @@ typedef	struct			s_cube
 	struct s_cube		*next;
 }						t_cube;
 
+typedef	struct			s_tore
+{
+	t_coo				o;
+	t_coo				dir;
+	t_coo				rot;
+	double				radiusa;
+	double				radiusb;
+	t_material			*color;
+	t_plane				*pln;
+	double				shine;
+	int					id;
+	struct s_tore		*next;
+}						t_tore;
+
+typedef	struct			s_parabol
+{
+	t_coo				o;
+	t_coo				dir;
+	t_coo				rot;
+	double				rad1;
+	double				rad2;
+	t_material			*color;
+	t_plane				*pln;
+	double				shine;
+	int					id;
+	struct s_parabol	*next;
+}						t_parabol;
+
 typedef struct			s_light
 {
 	t_coo				o;
 	t_material			*color;
+	t_coo				dir;
+	t_coo				norm;
+	double				angle;
 	double				power;
 	double				shine;
 	double				amb;
 	int					id;
-    int                 type;
 	struct s_light		*next;
 }						t_light;
 
@@ -161,44 +202,48 @@ typedef	struct			s_ray
 	t_coo				obj;
 }						t_ray;
 
-
-typedef enum            e_cam_mode
-{
-                        MONO,
-                        STEREO
-}                       t_cam_mode;
-
 typedef	struct			s_cam
 {
-    t_cam_mode          mode;
 	t_coo				pos;
 	t_coo				forw;
 	t_coo				up;
 	t_coo				right;
 	t_coo				rot;
-    struct s_cam        *left_cam;
-    struct s_cam        *right_cam;
 }						t_cam;
 
-typedef /*! \enum viewing type
- *
- *  This allows us to specify parallel or transverse
- *  viewing when the raytracer displays the images
- */
-enum                    e_view
-{
-                        parallel,
-                        transverse
-}                       t_viewing;
+/*
+** Equations structs
+*/
 
-typedef struct          s_stereo_cam
+typedef struct			s_equa
 {
-    t_cam               *cam_left;
-    t_cam               *cam_right;
-    int                 pixel_gap;
-    double              angle;
-    t_viewing           viewing;
-}                       t_stereo_cam;
+	double				ini[5];
+	double				a[5];
+	_Complex double		x[4];
+	_Complex double		u[3];
+	_Complex double		v[3];
+	double				min;
+}						t_equa;
+
+typedef struct			s_equa_2
+{
+	double				p;
+	double				q;
+	double				delta;
+	int					k;
+	_Complex double		j;
+	_Complex double		j2;
+}						t_equa_2;
+
+typedef struct			s_equa_3
+{
+	double				p;
+	double				q;
+	double				r;
+	double				y;
+	_Complex double		a0;
+	double				b0;
+}						t_equa_3;
 
 typedef	struct			s_view
 {
@@ -213,12 +258,12 @@ typedef	struct			s_inter
 	double				dst;
 	t_material			*mat;
 	t_material			*col;
-	t_material			*kdif;
-	t_material			*kspe;
+	t_material			*lgh;
 	t_ray				*angle;
 	t_coo				point;
 	int					obj;
 	int					num;
+	int					light;
 }						t_inter;
 
 typedef	struct			s_start
@@ -230,6 +275,8 @@ typedef	struct			s_start
 	t_cube				*cub;
 	t_ellipse			*ell;
 	t_light				*lgh;
+	t_tore				*tor;
+	t_parabol			*par;
 }						t_start;
 
 typedef	struct			s_options
@@ -241,7 +288,6 @@ typedef	struct			s_options
 	int					obj;
 	int					id;
 	int					cam_move;
-    int                 cam_stereo;
 }						t_options;
 
 typedef	struct			s_rt
@@ -256,42 +302,69 @@ typedef	struct			s_rt
 	t_cylinder			*cylinder;
 	t_cube				*cube;
 	t_ellipse			*ellipse;
+	t_parabol			*parabol;
+	t_tore				*tore;
 	t_view				*view;
 	t_ray				*light_ray;
 	t_inter				*inter;
 	t_start				*start;
 	t_options			*op;
-	int					switch_cam_mode;
+	double				amb;
+	t_equa				*equa;
 }						t_rt;
+
+/*
+** Errors
+*/
 
 void					ft_malloc_error(void);
 void					ft_bad_arg(int i);
 void					ft_exit(void);
+void					ttf_exit(void);
+
+/*
+** Initialisation
+*/
 
 void					ft_ini(t_rt *rt);
+void					ft_ini_cam(t_rt *rt);
 void					ft_create(t_rt *rt);
 void					parser(t_rt *rt, char *file);
 int						ft_check_obj(char *str, int fd, t_rt *rt);
 void					check_forms(t_rt *rt, int type);
 void					ft_reset(t_rt *rt);
+
+/*
+** Parser Datas
+*/
+
+int						tab_len(char **str);
 t_coo					get_coo(char **str, int err);
 t_material				*get_color(char **str);
 double					get_radius(char **str);
+void					free_parser(t_rt *rt);
+
+/*
+** Event
+*/
 
 int						my_key_press(t_rt *rt, SDL_Keysym key);
 int						ft_exit_cross(t_rt *rt);
-void					put_pxl(t_data *data, int x, int y, t_material *color);
-void					put_pxl_base(t_data *data, int x, int y,
-						t_material *color);
-                /* Threading functions   */
-int                     thread_render_1(void *rt);
-int                     thread_render_2(void *rt);
-int                     thread_render_3(void *rt);
-int                     thread_render_4(void *rt);
-                /* End of Threading functions   */
+
+/*
+** Core
+*/
 
 void					ft_raytracing(t_rt *rt);
 void					ft_check_object(t_rt *rt);
+
+void					put_pxl(t_data *data, int x, int y, t_material *color);
+void					put_pxl_base(t_data *data, int x, int y,
+						t_material *color);
+
+/*
+** Vectors
+*/
 
 t_coo					ft_new_vect(float x, float y, float z);
 t_coo					ft_add_vect(t_coo vect1, t_coo vect2);
@@ -299,67 +372,175 @@ t_coo					ft_div_vect(double i, t_coo vect);
 t_coo					ft_mult_vect(double i, t_coo vect);
 t_coo					ft_sub_vect(t_coo vect1, t_coo vect2);
 
+double					sqrt3(double a);
 double					scal(t_coo vect1, t_coo vect2);
 double					ft_dst(t_coo point1, t_coo point2);
 double					ft_norme(t_coo vect);
 t_coo					ft_normalize(t_coo vect);
 double					disc_eq(double t1, double t2);
 
+double					ft_min(t_rt *rt, t_equa *equa);
+void					ft_equa2(t_equa *equa, double a0, double a1, double a2);
+void					ft_equa3(t_rt *rt, double a0, t_coo data);
+void					ft_equa4(t_rt *rt);
+double					ft_real(t_equa *equa);
+
+/*
+** Sphere
+*/
+
 double					ft_check_sphere(t_sphere *sphere, t_ray *ray);
 void					check_sphere_inter(t_rt *rt, int type);
 void					ft_ini_sphere(t_rt *rt);
 int						ft_add_sphere(int fd, t_rt *rt, int id);
+void					ft_sphere_info(t_sphere *sphere);
+void					free_sphere(t_rt *rt);
+void					move_sphere(t_rt *rt, SDL_Event ev);
+
+/*
+** Plane
+*/
 
 void					check_plane_inter(t_rt *rt, int type);
 double					ft_check_plane(t_plane *plane, t_ray *ray);
 void					ft_ini_plane(t_rt *rt);
 int						ft_add_plane(int fd, t_rt *rt, int id);
+void					move_plane(t_rt *rt, SDL_Event ev);
+
+/*
+** Cone
+*/
 
 void					check_cone_inter(t_rt *rt, int type);
 double					ft_check_cone(t_cone *cone, t_ray *ray);
 int						ft_add_cone(int fd, t_rt *rt, int id);
+void					ft_cone_info(t_cone *cone);
+void					free_cone(t_rt *rt);
+void					move_cone(t_rt *rt, SDL_Event ev);
+
+/*
+** Cylinder
+*/
 
 int						ft_add_cylinder(int fd, t_rt *rt, int id);
 void					check_cylinder_inter(t_rt *rt, int type);
+void					free_cylinder(t_rt *rt);
+void					move_cyl(t_rt *rt, SDL_Event ev);
+
+/*
+** Parabol
+*/
+
+void					check_parabol_inter(t_rt *rt, int type);
+int						ft_add_parabol(int fd, t_rt *rt, int id);
+void					ft_parabol_info(t_parabol *parabol);
+void					free_parabol(t_rt *rt);
+
+/*
+** Tore
+*/
+
+int						ft_add_tore(int fd, t_rt *rt, int id);
+void					check_tore_inter(t_rt *rt, int type);
+double					ft_check_tore(t_rt *rt, t_ray *ray);
+void					ft_tore_info(t_tore *tore);
+void					free_tore(t_rt *rt);
+
+/*
+** Cam and Lights
+*/
 
 int						ft_add_light(int fd, t_rt *rt, int id);
 
+int						light_amb(t_rt *rt, int fd);
+
 int						ft_add_cam(int fd, t_rt *rt);
-void					ft_ini_cam(t_rt *rt);
 
 void					ft_get_point(t_rt *rt);
+void					ft_apply_light(t_rt *rt);
+void					ft_light_diffspec(t_rt *rt);
+void					ft_get_light(t_rt *rt);
+
+/*
+** Rotation
+*/
 
 t_coo					ft_rotation(t_coo vect, t_coo rot);
 void					make_rot(t_rt *rt);
 
+void					tore_para_rot(t_rt *rt);
+void					cyl_cone_rot(t_rt *rt);
+void					sphere_ellipse_rot(t_rt *rt);
+
+/*
+** Cube Functions
+*/
+
 t_coo					ft_det_vect(t_coo vect1, t_coo vect2);
 void					check_cube_inter(t_rt *rt, int type);
 int						ft_add_cube(int fd, t_rt *rt, int id);
+void					ft_angle_cube(t_cube *cube, int i);
+void					ft_face_cube(t_cube *cube, int i);
+void					ft_norm_cube(t_rt *rt, int i);
+
+/*
+** Antialiasing
+*/
 
 void					aliasing(t_rt *rt);
 void					ft_ray(t_rt *rt, int x, int y, int type);
 void					ft_ini_ray(t_rt *rt, double x, double y);
 
-double					ft_inter_plane_ini(t_ray *ray, t_plane *pln, double t1, double t2);
-//double					ft_inter_plane_obj(t_plane *pln, double dc, double t,
-//						double t1, double t2);
+/*
+** Cut plane Functions
+*/
+
+double					ft_inter_plane_ini(t_ray *ray, t_plane *pln,
+double t1, double t2);
+
+/*
+** Ellipse Functions
+*/
 
 void					check_ellipse_inter(t_rt *rt, int type);
 int						ft_add_ellipse(int fd, t_rt *rt, int id);
+void					ft_ellipse_info(t_ellipse *ellipse);
+
+/*
+** Color Functions
+*/
 
 t_material				hex_rgb(int col);
-t_cam_mode              get_view_mode(char **str, int err);
 unsigned int			col_hexa(int r, int g, int b);
 void					ft_check_expose(t_material *mat, double max);
+
+/*
+** Color Filters
+*/
 
 void					sepia(t_rt *rt);
 void					bl_wh(t_rt *rt);
 void					cpy_image(unsigned int *tab1, unsigned int *tab2);
 
+/*
+** Direct movement of objects
+*/
+
 void					move_object(t_rt *rt, SDL_Event ev);
 void					get_obj(t_rt *rt, int x, int y);
 void					move_camera(t_rt *rt, SDL_Event ev);
-void					show_cam_mode(t_cam_mode cam_mode);
 t_coo					ft_inv_rot(t_coo vect, t_coo rot);
 void					move_color(t_material *c, double r, double g, double b);
+
+void					rt_infos(t_rt *rt);
+
+/*
+** Threads Functions
+*/
+
+void                   *thread_render_1(void *);
+void                   *thread_render_2(void *);
+void                   *thread_render_3(void *);
+void                   *thread_render_4(void *);
+
 #endif

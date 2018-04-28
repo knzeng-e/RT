@@ -102,5 +102,6 @@ t_list			*ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem));
 int				get_next_line(const int fd, char **line);
 
 void			ft_malloc_error(void);
+int				ft_starts_with(char *str, char *str2);
 
 #endif
