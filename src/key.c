@@ -6,7 +6,7 @@
 /*   By: kboucaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/11/25 12:49:06 by kboucaud          #+#    #+#             */
-/*   Updated: 2018/04/27 19:36:22 by knzeng-e         ###   ########.fr       */
+/*   Updated: 2017/11/25 12:49:09 by kboucaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,26 +45,23 @@ int			my_key_press(t_rt *rt, SDL_Keysym key)
 	}
 	else if (key.sym == SDLK_m)
 	{
-		rt->switch_cam_mode = 1;
-		rt->cam->mode = (rt->cam->mode == MONO) ? STEREO : MONO;
+		rt->switch_cam_mode = (rt->switch_cam_mode) ? 0 : 1;
 		ft_ini_cam(rt);
+		rt->cam->mode = (rt->cam->mode == MONO) ? STEREO : MONO;
 		show_cam_mode(rt->cam->mode);
 	}
 	if (rt->switch_cam_mode == 1)
-    {
-        rt->switch_cam_mode = 0;
-        ft_raytracing(rt);
-    }
-    if (rt->op->blwh)
-        bl_wh(rt);
-    if (rt->op->sepia)
-        sepia(rt);
-    return (0);
+		ft_raytracing(rt);
+	if (rt->op->blwh)
+		bl_wh(rt);
+	if (rt->op->sepia)
+		sepia(rt);
+	return (0);
 }
 
 int			ft_exit_cross(t_rt *rt)
 {
-    quit_sdl(rt);
-    exit(EXIT_SUCCESS);
-    return (0);
+	quit_sdl(rt);
+	exit(EXIT_SUCCESS);
+	return (0);
 }
